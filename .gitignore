@@ -1,0 +1,5 @@
+.venv*
+.env*
+chroma_langchain_db*
+pdf*
+test.ipynb*
