@@ -109,6 +109,9 @@ def rag_implementation(question: str) -> str:
         [
             ("system",
                 '''与えられた質問文がどのカテゴリーに含まれるか答えてください。回答はカテゴリーのみ答えてください。
+                以下カテゴリーに分類できない場合は、
+                その他
+                と回答してください。
                 カテゴリー
                 {category}'''
             ),
@@ -119,9 +122,13 @@ def rag_implementation(question: str) -> str:
     category_message = category_template.format_messages(category=category, user_input=question)
     category_output = llm.invoke(category_message)
 
-    print(category_output)
-    print(category)
-    docs_and_scores = vector_store.similarity_search_with_score(question, filter={"title": category_output.content})
+    
+    if category_output.content == "その他":
+        print(category_output.content)
+        docs_and_scores = vector_store.similarity_search_with_score(question)
+    else:
+        docs_and_scores = vector_store.similarity_search_with_score(question, filter={"title": category_output.content})
+    
     similar_point = 0.8  # この数値を以下を引用対象とする
     filtered_docs_and_scores = [item for item in docs_and_scores if item[1] <= similar_point]  # ステップ2: フィルタリング
     inputdata = ""
@@ -131,7 +138,7 @@ def rag_implementation(question: str) -> str:
             ############\n
         '''
 
-    print(docs_and_scores)
+    print(filtered_docs_and_scores)
     
     # プロンプトテンプレート
     chat_template = ChatPromptTemplate(
