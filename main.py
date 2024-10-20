@@ -125,7 +125,7 @@ def rag_implementation(question: str) -> str:
     similar_point = 0.8  # この数値を以下を引用対象とする
     filtered_docs_and_scores = [item for item in docs_and_scores if item[1] <= similar_point]  # ステップ2: フィルタリング
     inputdata = ""
-    for i,doc_and_score in enumerate(docs_and_scores):
+    for i,doc_and_score in enumerate(filtered_docs_and_scores):
         inputdata +=f'''###{i+1}件目引用資料###\n
             {doc_and_score[0].page_content}\n
             ############\n
